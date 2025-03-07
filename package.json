@@ -1,0 +1,29 @@
+{
+  "name": "turn-based-combat-system",
+  "version": "1.0.0",
+  "description": "A turn-based combat system inspired by Honkai: Star Rail.",
+  "main": "src/main.ts",
+  "scripts": {
+    "start": "tsx src/main.ts",
+    "build": "tsc-esm",
+    "dev": "concurrently --raw 'tsc --watch --preserveWatchOutput' 'es-dev-server --app-index index.html --node-resolve --watch --open'",
+    "postdev": "npm run build"
+  },
+  "devDependencies": {
+    "@digitak/tsc-esm": "^3.1.4",
+    "@types/blessed": "^0.1.25",
+    "@types/node": "^16.18.126",
+    "concurrently": "^9.1.2",
+    "es-dev-server": "^2.1.0",
+    "http-server": "^14.1.1",
+    "tsx": "^4.19.3",
+    "typescript": "^4.5.4"
+  },
+  "keywords": [
+    "turn-based",
+    "combat",
+    "typescript"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
