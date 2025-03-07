@@ -2,7 +2,7 @@ import { Character } from './character';
 import { Battle } from './battle';
 
 const hero1 = new Character('Hero 1', 100, [15], 160);
-const hero2 = new Character('Hero 2', 100, [10, 5, 2], 115);
+const hero2 = new Character('Hero 2', 100, [10, 5], 115);
 const enemy1 = new Character('Monster 1', 80, [9, 2, 1], 113);
 const enemy2 = new Character('Monster 2', 80, [9], 80);
 const enemy3 = new Character('Monster 3', 80, [6], 82);
@@ -13,13 +13,15 @@ const heroes = [hero1, hero2];
 const enemies = [enemy1, enemy2, enemy3, enemy4, enemy5];
 const battle = new Battle(heroes, enemies);
 
+battle.on('redraw', updateBattlefield);
+
 function getStatusDiv(character: Character) {
   const statusDiv = document.createElement('div');
   statusDiv.classList.add('status');
   statusDiv.innerHTML = `
-    <span title="HP">❤️ ${character.health}</span>
-    <span title="Скорость">⚡ ${character.speed}</span>
-    <span title="Атака">💪 ${character.attack.join(', ')}</span>
+    <span>HP ${character.health}</span>
+    <span>Скорость ${character.speed}</span>
+    <span>Атака ${character.attack.join(', ')}</span>
   `;
   return statusDiv;
 }
@@ -32,8 +34,8 @@ export function updateBattlefield() {
   enemiesDiv.innerHTML = '';
   logDiv.innerHTML = battle.getLog();
 
-  const sortedHeroes = [...battle.heroes].reverse().sort((a, b) => b.isAlive() ? 1 : -1);
-  const sortedEnemies = [...battle.enemies].reverse().sort((a, b) => b.isAlive() ? 1 : -1);
+  const sortedHeroes = [...battle.heroes].sort((a, b) => b.isAlive() ? 1 : -1);
+  const sortedEnemies = [...battle.enemies].sort((a, b) => b.isAlive() ? 1 : -1);
 
   sortedHeroes.forEach(hero => {
     const heroDiv = document.createElement('div');
@@ -57,17 +59,10 @@ export function updateBattlefield() {
     enemyDiv.innerHTML = `<b>${enemy.name}</b>`;
     enemyDiv.title = `Урон: Основная цель: ${enemy.attack[0] || 0}, Соседи: ${enemy.attack[1] || 0}, Остальные: ${enemy.attack[2] || 0}`;
     enemyDiv.id = enemy.id;
+    enemyDiv.onclick = () => battle.selectTarget(enemy);
     enemyDiv.appendChild(getStatusDiv(enemy));
     enemiesDiv.appendChild(enemyDiv);
   });
 }
 
-async function runBattleAutomatically() {
-  while (!battle.hasDeadSide()) {
-    await battle.executeTurn();
-    updateBattlefield(); // обновляем интерфейс после каждого хода
-  }
-}
-
-updateBattlefield();
-runBattleAutomatically();
+battle.runBattle();

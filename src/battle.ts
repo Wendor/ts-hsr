@@ -1,15 +1,17 @@
 import { Character } from './character';
+import { EventEmitter } from './components/event-emitter';
 import { Timeline } from './timeline';
-import { updateBattlefield } from './main'; // импортируем функцию обновления интерфейса
 
-export class Battle {
+export class Battle extends EventEmitter {
   public heroes: Character[];
   public enemies: Character[];
   public timeline: Timeline;
   private log: string[] = [];
   private currentCharacter: Character | null = null;
+  private targetCharacter: Character | null = null;
 
   constructor(heroes: Character[], enemies: Character[]) {
+    super();
     this.heroes = heroes;
     this.enemies = enemies;
     this.timeline = new Timeline([...this.heroes, ...this.enemies]);
@@ -39,17 +41,18 @@ export class Battle {
 
   public async runBattle(): Promise<void> {
     while (!this.hasDeadSide()) {
-      await this.executeTurn();
+      this.prepareTurn();
+      while (!this.targetCharacter) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      this.executeTurn();
+      this.finishTurn();
     }
     this.endBattle();
   }
 
   private getAliveTargets(character: Character): Character[] {
     return this.getTargetSide(character).filter(c => c.isAlive());
-  }
-
-  private getAliveAllies(character: Character): Character[] {
-    return this.getAllySide(character).filter(c => c.isAlive());
   }
 
   private getRandomEnemy(attacker: Character): Character | null {
@@ -61,46 +64,17 @@ export class Battle {
     return aliveEnemies[randomIndex];
   }
 
-  private getLowHPEnemy(attacker: Character): Character | null {
-    const aliveEnemies = this.getAliveTargets(attacker);
-    if (aliveEnemies.length === 0) {
-      return null;
-    }
-    return aliveEnemies.sort((a, b) => a.health - b.health)[0];
-  }
-
-  private getMaxNeiborsEnemy(attacker: Character): Character | null {
-    const aliveEnemies = this.getAliveTargets(attacker);
-    if (aliveEnemies.length === 0) {
-      return null;
-    }
-    return aliveEnemies
-      .sort((a, b) => b.health - a.health)
-      .sort((a, b) => this.getNeibours(b).length - this.getNeibours(a).length)
-      [0];
-  }
-
-  public logBattleStatus(character: Character, full = false): void {
-    const heroes = full ? this.heroes : this.heroes.filter(c => c.isAlive());
-    const enemies = full ? this.enemies : this.enemies.filter(c => c.isAlive());
-    console.table(
-      heroes
-        .map(c => ({ ...c, name: (c == character ? `*` : '') + c.name }))
-    );
-    console.table(enemies);
-  }
-
   private attackTarget(attacker: Character, target: Character, damage: number): void {
     const attackerIsHero = this.heroes.includes(attacker);
     const targetIsHero = this.heroes.includes(target);
+    attacker.attackEnemy(target, damage);
     const logMessage = [
       attackerIsHero ? attacker.name : attacker.name,
       `атакует`,
       targetIsHero ? target.name : target.name,
-      `с ${damage} урона.`
+      `с ${damage} урона. Осталось ${target.health} HP`
     ].join(' ');
     this.log.push(logMessage);
-    attacker.attackEnemy(target, damage);
   }
 
   private attackManyTargets(attacker: Character, target: Character, damage: number[]): void {
@@ -130,56 +104,52 @@ export class Battle {
     }
   }
 
-  private async selectTargetFromUI(character: Character): Promise<Character | null> {
-    return new Promise((resolve) => {
-      const targetButtons = document.querySelectorAll('.enemy');
-      targetButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          const target = this.getAliveTargets(character).find(c => c.id === button.id);
-          resolve(target || null);
-        });
-      });
-    });
+  public selectTarget(target: Character): void {
+    this.targetCharacter = target;
   }
 
   public isCurrentCharacter(character: Character): boolean {
     return this.currentCharacter === character;
   }
 
-  public async executeTurn(): Promise<void> {
+  public prepareTurn(): void {
     const timeline = this.timeline.getNextTimelineCharacter();
     const character = timeline.character;
     this.currentCharacter = character;
+    this.targetCharacter = null;
     this.log.push('');
     this.log.push(`Индекс действия <b>${timeline.actionPoint}</b>`);
-    updateBattlefield();
-    if (character.isAlive()) {
-      let target: Character | null = null;
-      const isHero = this.heroes.includes(character);
-      if (isHero) {
-        while (!target) {
-          target = await this.selectTargetFromUI(character);
-        }
-      } else {
-        target = this.getRandomEnemy(character);
-      }
-      // const target = this.enemies.includes(character)
-      //   ? this.getRandomEnemy(character)
-      //   : character.hasAoE()
-      //     ? this.getMaxNeiborsEnemy(character)
-      //     : this.getLowHPEnemy(character);
-
-      if (target) {
-        this.attackManyTargets(character, target, character.attack);
-      }
+    if (!this.isHero(character)) {
+      this.targetCharacter = this.getRandomEnemy(character);
     }
+    this.emit('redraw');
+  }
+
+  public isHero(character?: Character|null): boolean {
+    if (!character) {
+      return false;
+    }
+    return this.heroes.includes(character);
+  }
+
+  public async executeTurn(): Promise<void> {
+    const character = this.currentCharacter;
+    const target = this.targetCharacter;
+    if (!character || !target) {
+      return;
+    }
+    this.attackManyTargets(character, target, character.attack);
+  }
+
+  public finishTurn(): void {
     this.timeline.finishTurn();
     this.currentCharacter = null;
-    updateBattlefield(); // обновляем интерфейс после завершения хода
+    this.emit('redraw');
   }
 
   public endBattle(): void {
-    this.logBattleStatus(this.heroes[0], true);
+    this.log.push('Бой окончен');
+    this.emit('redraw');
   }
 
   public getLog(): string {
