@@ -7,9 +7,6 @@ export class Character {
         this.speed = speed;
         this.id = crypto.randomUUID();
     }
-    hasAoE() {
-        return !!(this.attack[1] || this.attack[2]);
-    }
     attackEnemy(enemy, damage) {
         enemy.takeDamage(damage);
     }

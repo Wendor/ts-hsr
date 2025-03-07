@@ -19,36 +19,21 @@ export class Battle extends EventEmitter {
         this.enemies = enemies;
         this.timeline = new Timeline([...this.heroes, ...this.enemies]);
     }
+    isHero(character) {
+        if (!character) {
+            return false;
+        }
+        return this.heroes.includes(character);
+    }
+    isCurrentCharacter(character) {
+        return this.currentCharacter === character;
+    }
     hasDeadSide() {
         return this.heroes.every(character => !character.isAlive())
             || this.enemies.every(enemy => !enemy.isAlive());
     }
     getTargetSide(character) {
         return this.heroes.includes(character) ? this.enemies : this.heroes;
-    }
-    getAllySide(character) {
-        return this.heroes.includes(character) ? this.heroes : this.enemies;
-    }
-    getNeibours(character) {
-        const allySide = this.getAllySide(character).filter(c => c.isAlive());
-        const characterIndex = allySide.indexOf(character);
-        return [
-            allySide[characterIndex - 1],
-            allySide[characterIndex + 1]
-        ].filter(Boolean);
-    }
-    runBattle() {
-        return __awaiter(this, void 0, void 0, function* () {
-            while (!this.hasDeadSide()) {
-                this.prepareTurn();
-                while (!this.targetCharacter) {
-                    yield new Promise(resolve => setTimeout(resolve, 100));
-                }
-                this.executeTurn();
-                this.finishTurn();
-            }
-            this.endBattle();
-        });
     }
     getAliveTargets(character) {
         return this.getTargetSide(character).filter(c => c.isAlive());
@@ -62,14 +47,13 @@ export class Battle extends EventEmitter {
         return aliveEnemies[randomIndex];
     }
     attackTarget(attacker, target, damage) {
-        const attackerIsHero = this.heroes.includes(attacker);
-        const targetIsHero = this.heroes.includes(target);
         attacker.attackEnemy(target, damage);
         const logMessage = [
-            attackerIsHero ? attacker.name : attacker.name,
+            attacker.name,
             `атакует`,
-            targetIsHero ? target.name : target.name,
-            `с ${damage} урона. Осталось ${target.health} HP`
+            target.name,
+            `с ${damage} урона.`,
+            `Осталось ${target.health} HP`
         ].join(' ');
         this.log.push(logMessage);
     }
@@ -99,8 +83,18 @@ export class Battle extends EventEmitter {
     selectTarget(target) {
         this.targetCharacter = target;
     }
-    isCurrentCharacter(character) {
-        return this.currentCharacter === character;
+    runBattle() {
+        return __awaiter(this, void 0, void 0, function* () {
+            while (!this.hasDeadSide()) {
+                this.prepareTurn();
+                while (!this.targetCharacter) {
+                    yield new Promise(resolve => setTimeout(resolve, 100));
+                }
+                this.executeTurn();
+                this.finishTurn();
+            }
+            this.endBattle();
+        });
     }
     prepareTurn() {
         const timeline = this.timeline.getNextTimelineCharacter();
@@ -113,12 +107,6 @@ export class Battle extends EventEmitter {
             this.targetCharacter = this.getRandomEnemy(character);
         }
         this.emit('redraw');
-    }
-    isHero(character) {
-        if (!character) {
-            return false;
-        }
-        return this.heroes.includes(character);
     }
     executeTurn() {
         return __awaiter(this, void 0, void 0, function* () {
