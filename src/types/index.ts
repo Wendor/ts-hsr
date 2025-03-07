@@ -1,6 +1,7 @@
 import { Character } from "src/character";
 
 export interface CharacterStats {
+  id: string;
   name: string;
   health: number;
   attack: number[];

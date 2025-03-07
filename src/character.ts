@@ -6,12 +6,14 @@ export class Character implements CharacterStats {
   attack: number[]; // at target, at neibours, at others
   speed: number;
   attacked: boolean = false;
+  id: string;
 
   constructor(name: string, health: number, attack: number[], speed: number) {
     this.name = name;
     this.health = health;
     this.attack = attack;
     this.speed = speed;
+    this.id = crypto.randomUUID();
   }
 
   hasAoE(): boolean {
