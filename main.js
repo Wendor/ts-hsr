@@ -21,6 +21,24 @@ function getStatusDiv(character) {
   `;
     return statusDiv;
 }
+function getCharacterDiv(character) {
+    const div = document.createElement('div');
+    div.classList.add('character');
+    div.classList.add(battle.isHero(character) ? 'hero' : 'enemy');
+    if (!character.isAlive())
+        div.classList.add('dead');
+    if (battle.isCurrentCharacter(character))
+        div.classList.add('current');
+    if (character.isAttacked())
+        div.classList.add('attack-effect');
+    div.innerHTML = `<b>${character.name}</b>`;
+    div.id = character.id;
+    div.appendChild(getStatusDiv(character));
+    if (!battle.isHero(character)) {
+        div.onclick = () => battle.selectTarget(character);
+    }
+    return div;
+}
 export function updateBattlefield() {
     const heroesDiv = document.getElementById('heroes');
     const enemiesDiv = document.getElementById('enemies');
@@ -28,38 +46,19 @@ export function updateBattlefield() {
     heroesDiv.innerHTML = '';
     enemiesDiv.innerHTML = '';
     logDiv.innerHTML = battle.getLog();
-    const sortedHeroes = [...battle.heroes].sort((a, b) => b.isAlive() ? 1 : -1);
-    const sortedEnemies = [...battle.enemies].sort((a, b) => b.isAlive() ? 1 : -1);
+    const sortedHeroes = [
+        ...battle.heroes.filter(c => c.isAlive()),
+        ...battle.heroes.filter(c => !c.isAlive())
+    ];
+    const sortedEnemies = [
+        ...battle.enemies.filter(c => c.isAlive()),
+        ...battle.enemies.filter(c => !c.isAlive())
+    ];
     sortedHeroes.forEach(hero => {
-        const heroDiv = document.createElement('div');
-        heroDiv.classList.add('character', 'hero');
-        if (!hero.isAlive())
-            heroDiv.classList.add('dead');
-        if (battle.isCurrentCharacter(hero))
-            heroDiv.classList.add('current');
-        if (hero.isAttacked())
-            heroDiv.classList.add('attack-effect');
-        heroDiv.innerHTML = `<b>${hero.name}</b>`;
-        heroDiv.title = `Урон: Основная цель: ${hero.attack[0] || 0}, Соседи: ${hero.attack[1] || 0}, Остальные: ${hero.attack[2] || 0}`;
-        heroDiv.id = hero.id;
-        heroDiv.appendChild(getStatusDiv(hero));
-        heroesDiv.appendChild(heroDiv);
+        heroesDiv.appendChild(getCharacterDiv(hero));
     });
     sortedEnemies.forEach(enemy => {
-        const enemyDiv = document.createElement('div');
-        enemyDiv.classList.add('character', 'enemy');
-        if (!enemy.isAlive())
-            enemyDiv.classList.add('dead');
-        if (battle.isCurrentCharacter(enemy))
-            enemyDiv.classList.add('current');
-        if (enemy.isAttacked())
-            enemyDiv.classList.add('attack-effect');
-        enemyDiv.innerHTML = `<b>${enemy.name}</b>`;
-        enemyDiv.title = `Урон: Основная цель: ${enemy.attack[0] || 0}, Соседи: ${enemy.attack[1] || 0}, Остальные: ${enemy.attack[2] || 0}`;
-        enemyDiv.id = enemy.id;
-        enemyDiv.onclick = () => battle.selectTarget(enemy);
-        enemyDiv.appendChild(getStatusDiv(enemy));
-        enemiesDiv.appendChild(enemyDiv);
+        enemiesDiv.appendChild(getCharacterDiv(enemy));
     });
 }
 battle.runBattle();
