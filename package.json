@@ -4,7 +4,6 @@
   "description": "A turn-based combat system inspired by Honkai: Star Rail.",
   "main": "src/main.ts",
   "scripts": {
-    "start": "tsx src/main.ts",
     "build": "tsc-esm",
     "dev": "concurrently --raw 'tsc --watch --preserveWatchOutput' 'es-dev-server --app-index index.html --node-resolve --watch --open'",
     "postdev": "npm run build"
