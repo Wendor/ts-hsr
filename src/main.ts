@@ -13,6 +13,17 @@ const heroes = [hero1, hero2];
 const enemies = [enemy1, enemy2, enemy3, enemy4, enemy5];
 const battle = new Battle(heroes, enemies);
 
+function getStatusDiv(character: Character) {
+  const statusDiv = document.createElement('div');
+  statusDiv.classList.add('status');
+  statusDiv.innerHTML = `
+    <span title="HP">❤️ ${character.health}</span>
+    <span title="Скорость">⚡ ${character.speed}</span>
+    <span title="Атака">💪 ${character.attack.join(', ')}</span>
+  `;
+  return statusDiv;
+}
+
 export function updateBattlefield() {
   const heroesDiv = document.getElementById('heroes') as HTMLElement;
   const enemiesDiv = document.getElementById('enemies') as HTMLElement;
@@ -33,14 +44,7 @@ export function updateBattlefield() {
     heroDiv.innerHTML = `<b>${hero.name}</b>`;
     heroDiv.title = `Урон: Основная цель: ${hero.attack[0] || 0}, Соседи: ${hero.attack[1] || 0}, Остальные: ${hero.attack[2] || 0}`;
     heroDiv.id = hero.id;
-    const statusDiv = document.createElement('div');
-    statusDiv.classList.add('status');
-    statusDiv.innerHTML = `
-      <span>❤️ ${hero.health}</span>
-      <span>🏃 ${hero.speed}</span>
-      <span>🗡️ ${hero.attack.join(', ')}</span>
-    `;
-    heroDiv.appendChild(statusDiv);
+    heroDiv.appendChild(getStatusDiv(hero));
     heroesDiv.appendChild(heroDiv);
   });
 
@@ -53,14 +57,7 @@ export function updateBattlefield() {
     enemyDiv.innerHTML = `<b>${enemy.name}</b>`;
     enemyDiv.title = `Урон: Основная цель: ${enemy.attack[0] || 0}, Соседи: ${enemy.attack[1] || 0}, Остальные: ${enemy.attack[2] || 0}`;
     enemyDiv.id = enemy.id;
-    const statusDiv = document.createElement('div');
-    statusDiv.classList.add('status');
-    statusDiv.innerHTML = `
-      <span>❤️ ${enemy.health}</span>
-      <span>🏃 ${enemy.speed}</span>
-      <span>🗡️ ${enemy.attack.join(', ')}</span>
-    `;
-    enemyDiv.appendChild(statusDiv);
+    enemyDiv.appendChild(getStatusDiv(enemy));
     enemiesDiv.appendChild(enemyDiv);
   });
 }
