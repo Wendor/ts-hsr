@@ -5,6 +5,7 @@ export class Character {
         this.health = health;
         this.attack = attack;
         this.speed = speed;
+        this.id = crypto.randomUUID();
     }
     hasAoE() {
         return !!(this.attack[1] || this.attack[2]);

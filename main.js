@@ -37,8 +37,9 @@ export function updateBattlefield() {
             heroDiv.classList.add('current');
         if (hero.isAttacked())
             heroDiv.classList.add('attack-effect');
-        heroDiv.innerText = `${hero.name}`;
+        heroDiv.innerHTML = `<b>${hero.name}</b>`;
         heroDiv.title = `Урон: Основная цель: ${hero.attack[0] || 0}, Соседи: ${hero.attack[1] || 0}, Остальные: ${hero.attack[2] || 0}`;
+        heroDiv.id = hero.id;
         const statusDiv = document.createElement('div');
         statusDiv.classList.add('status');
         statusDiv.innerHTML = `
@@ -58,9 +59,9 @@ export function updateBattlefield() {
             enemyDiv.classList.add('current');
         if (enemy.isAttacked())
             enemyDiv.classList.add('attack-effect');
-        enemyDiv.innerText = `${enemy.name}`;
+        enemyDiv.innerHTML = `<b>${enemy.name}</b>`;
         enemyDiv.title = `Урон: Основная цель: ${enemy.attack[0] || 0}, Соседи: ${enemy.attack[1] || 0}, Остальные: ${enemy.attack[2] || 0}`;
-        enemyDiv.id = enemy.name;
+        enemyDiv.id = enemy.id;
         const statusDiv = document.createElement('div');
         statusDiv.classList.add('status');
         statusDiv.innerHTML = `
