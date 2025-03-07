@@ -15,6 +15,7 @@ export class Battle extends EventEmitter {
         this.log = [];
         this.currentCharacter = null;
         this.targetCharacter = null;
+        this.currentSkill = null;
         this.heroes = heroes;
         this.enemies = enemies;
         this.timeline = new Timeline([...this.heroes, ...this.enemies]);
@@ -32,6 +33,9 @@ export class Battle extends EventEmitter {
         return this.heroes.every(character => !character.isAlive())
             || this.enemies.every(enemy => !enemy.isAlive());
     }
+    getCharacterSide(character) {
+        return this.heroes.includes(character) ? this.heroes : this.enemies;
+    }
     getTargetSide(character) {
         return this.heroes.includes(character) ? this.enemies : this.heroes;
     }
@@ -46,42 +50,22 @@ export class Battle extends EventEmitter {
         const randomIndex = Math.floor(Math.random() * aliveEnemies.length);
         return aliveEnemies[randomIndex];
     }
-    attackTarget(attacker, target, damage) {
-        attacker.attackEnemy(target, damage);
-        const logMessage = [
-            attacker.name,
-            `атакует`,
-            target.name,
-            `с ${damage} урона.`,
-            `Осталось ${target.health} HP`
-        ].join(' ');
-        this.log.push(logMessage);
-    }
-    attackManyTargets(attacker, target, damage) {
-        // Получаем список живых целей
-        const targetSide = this.getAliveTargets(attacker);
-        const targetIndex = targetSide.indexOf(target);
-        // Атакуем основную цель, если урон для нее задан
-        if (damage[0]) {
-            this.attackTarget(attacker, target, damage[0]);
-        }
-        // Атакуем соседей основной цели, если урон для них задан
-        let neighbors = [];
-        if (damage[1]) {
-            neighbors = [
-                targetSide[targetIndex - 1],
-                targetSide[targetIndex + 1]
-            ].filter(Boolean);
-            neighbors.forEach(t => this.attackTarget(attacker, t, damage[1]));
-        }
-        // Атакуем остальных врагов, если урон для них задан
-        if (damage[2]) {
-            const others = targetSide.filter(c => c !== target && !neighbors.includes(c));
-            others.forEach(o => this.attackTarget(attacker, o, damage[2]));
-        }
-    }
     selectTarget(target) {
+        if (!this.currentCharacter || !this.currentSkill) {
+            return;
+        }
+        const skill = this.currentSkill;
+        const side = this.getCharacterSide(target);
+        if (skill.heal && !side.includes(this.currentCharacter)) {
+            return;
+        }
+        if (skill.damage && side.includes(this.currentCharacter)) {
+            return;
+        }
         this.targetCharacter = target;
+    }
+    selectSkill(skill) {
+        this.currentSkill = skill;
     }
     runBattle() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -103,6 +87,7 @@ export class Battle extends EventEmitter {
         this.targetCharacter = null;
         this.log.push('');
         this.log.push(`Индекс действия <b>${timeline.actionPoint}</b>`);
+        this.currentSkill = character.skills[0];
         if (!this.isHero(character)) {
             this.targetCharacter = this.getRandomEnemy(character);
         }
@@ -112,10 +97,13 @@ export class Battle extends EventEmitter {
         return __awaiter(this, void 0, void 0, function* () {
             const character = this.currentCharacter;
             const target = this.targetCharacter;
-            if (!character || !target) {
+            const skill = this.currentSkill;
+            if (!character || !target || !skill) {
                 return;
             }
-            this.attackManyTargets(character, target, character.attack);
+            if (this.currentSkill) {
+                skill.use(this);
+            }
         });
     }
     finishTurn() {
