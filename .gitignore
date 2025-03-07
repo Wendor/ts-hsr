@@ -12,7 +12,7 @@ logs/
 *.tsbuildinfo
 
 # Dist
-#dist/
+dist/
 
 # Environment variables
 .env

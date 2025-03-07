@@ -1,0 +1,5 @@
+npm run build
+git checkout pages
+git checkout master -- index.html
+git diff --quiet HEAD || git commit -m 'update pages'
+git checkouut master
