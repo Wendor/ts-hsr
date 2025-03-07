@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turn-Based Combat System</title>
+    <style>
+      body { font-family: Arial, sans-serif; }
+      .character { margin: 10px; padding: 10px; width: 300px; border: 1px solid #ccc; }
+      .hero { background-color: #e0ffe0; }
+      .enemy { background-color: #ffe0e0; cursor: pointer; user-select: none;}
+      .dead { background-color: #d3d3d3; color: #808080; }
+      .current { border: 2px solid #c87bff; }
+    </style>
+</head>
+<body>
+    <h1>Turn-Based Combat System</h1>
+    <div id="battlefield" class="row" style="display: flex;">
+      <div id="heroes"></div>
+      <div id="enemies"></div>
+      <div id="log" style="margin-left: 50px; height: 260px; width: 400px; overflow-y: auto;"></div>
+    </div>
+    <script src="./main.js" type="module"></script>
+</body>
+</html>
