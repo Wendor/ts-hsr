@@ -16,10 +16,6 @@ export class Character implements CharacterStats {
     this.id = crypto.randomUUID();
   }
 
-  hasAoE(): boolean {
-    return !!(this.attack[1] || this.attack[2]);
-  }
-
   attackEnemy(enemy: Character, damage: number): void {
     enemy.takeDamage(damage);
   }

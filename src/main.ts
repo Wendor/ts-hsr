@@ -1,6 +1,5 @@
 import { Character } from './character';
 import { Battle } from './battle';
-import { get } from 'http';
 
 const hero1 = new Character('Hero 1', 100, [15], 160);
 const hero2 = new Character('Hero 2', 100, [10, 5], 115);

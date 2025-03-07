@@ -17,6 +17,17 @@ export class Battle extends EventEmitter {
     this.timeline = new Timeline([...this.heroes, ...this.enemies]);
   }
 
+  public isHero(character?: Character|null): boolean {
+    if (!character) {
+      return false;
+    }
+    return this.heroes.includes(character);
+  }
+
+  public isCurrentCharacter(character: Character): boolean {
+    return this.currentCharacter === character;
+  }
+
   public hasDeadSide(): boolean {
     return this.heroes.every(character => !character.isAlive())
       || this.enemies.every(enemy => !enemy.isAlive());
@@ -24,31 +35,6 @@ export class Battle extends EventEmitter {
 
   private getTargetSide(character: Character): Character[] {
     return this.heroes.includes(character) ? this.enemies : this.heroes;
-  }
-
-  private getAllySide(character: Character): Character[] {
-    return this.heroes.includes(character) ? this.heroes : this.enemies;
-  }
-
-  private getNeibours(character: Character): Character[] {
-    const allySide = this.getAllySide(character).filter(c => c.isAlive());
-    const characterIndex = allySide.indexOf(character);
-    return [
-      allySide[characterIndex - 1],
-      allySide[characterIndex + 1]
-    ].filter(Boolean);
-  }
-
-  public async runBattle(): Promise<void> {
-    while (!this.hasDeadSide()) {
-      this.prepareTurn();
-      while (!this.targetCharacter) {
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-      this.executeTurn();
-      this.finishTurn();
-    }
-    this.endBattle();
   }
 
   private getAliveTargets(character: Character): Character[] {
@@ -65,14 +51,13 @@ export class Battle extends EventEmitter {
   }
 
   private attackTarget(attacker: Character, target: Character, damage: number): void {
-    const attackerIsHero = this.heroes.includes(attacker);
-    const targetIsHero = this.heroes.includes(target);
     attacker.attackEnemy(target, damage);
     const logMessage = [
-      attackerIsHero ? attacker.name : attacker.name,
+      attacker.name,
       `атакует`,
-      targetIsHero ? target.name : target.name,
-      `с ${damage} урона. Осталось ${target.health} HP`
+      target.name,
+      `с ${damage} урона.`,
+      `Осталось ${target.health} HP`
     ].join(' ');
     this.log.push(logMessage);
   }
@@ -108,8 +93,16 @@ export class Battle extends EventEmitter {
     this.targetCharacter = target;
   }
 
-  public isCurrentCharacter(character: Character): boolean {
-    return this.currentCharacter === character;
+  public async runBattle(): Promise<void> {
+    while (!this.hasDeadSide()) {
+      this.prepareTurn();
+      while (!this.targetCharacter) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+      this.executeTurn();
+      this.finishTurn();
+    }
+    this.endBattle();
   }
 
   public prepareTurn(): void {
@@ -123,13 +116,6 @@ export class Battle extends EventEmitter {
       this.targetCharacter = this.getRandomEnemy(character);
     }
     this.emit('redraw');
-  }
-
-  public isHero(character?: Character|null): boolean {
-    if (!character) {
-      return false;
-    }
-    return this.heroes.includes(character);
   }
 
   public async executeTurn(): Promise<void> {

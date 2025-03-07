@@ -16,7 +16,7 @@ export interface BattleResult {
 export interface Action {
   type: string;
   target: string;
-  damage?: number;
+  damage: number;
   specialAbility?: string;
 }
 
