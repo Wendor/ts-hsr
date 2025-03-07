@@ -11,6 +11,11 @@
       .enemy { background-color: #ffe0e0; cursor: pointer; user-select: none;}
       .dead { background-color: #d3d3d3; color: #808080; }
       .current { border: 2px solid #c87bff; }
+      .attack-effect { animation: attackEffect 0.7s; }
+      @keyframes attackEffect {
+        0% { opacity: 0.5; }
+        100% { opacity: inherit; }
+      }
     </style>
 </head>
 <body>

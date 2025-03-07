@@ -1,5 +1,6 @@
 export class Character {
     constructor(name, health, attack, speed) {
+        this.attacked = false;
         this.name = name;
         this.health = health;
         this.attack = attack;
@@ -16,6 +17,11 @@ export class Character {
         if (this.health < 0) {
             this.health = 0;
         }
+        this.attacked = true;
+        setTimeout(() => this.attacked = false, 500);
+    }
+    isAttacked() {
+        return this.attacked;
     }
     isAlive() {
         return this.health > 0;
