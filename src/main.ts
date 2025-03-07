@@ -26,18 +26,40 @@ export function updateBattlefield() {
 
   sortedHeroes.forEach(hero => {
     const heroDiv = document.createElement('div');
-    heroDiv.className = `character hero ${hero.isAlive() ? '' : 'dead'} ${battle.isCurrentCharacter(hero) ? 'current' : ''}`;
-    heroDiv.innerText = `${hero.name} - ❤️ ${hero.health} 🏃 ${hero.speed} 🗡️ ${hero.attack.join(', ')}`;
-    heroDiv.title = `Урон: Основная цель: ${hero.attack[0] || 0}, Соседи: ${hero.attack[1] || 0}, Остальные: ${hero.attack[2] || 0}`; // добавляем подробное описание урона
+    heroDiv.classList.add('character', 'hero');
+    if (!hero.isAlive()) heroDiv.classList.add('dead');
+    if (battle.isCurrentCharacter(hero)) heroDiv.classList.add('current');
+    if (hero.isAttacked()) heroDiv.classList.add('attack-effect');
+    heroDiv.innerText = `${hero.name}`;
+    heroDiv.title = `Урон: Основная цель: ${hero.attack[0] || 0}, Соседи: ${hero.attack[1] || 0}, Остальные: ${hero.attack[2] || 0}`;
+    const statusDiv = document.createElement('div');
+    statusDiv.classList.add('status');
+    statusDiv.innerHTML = `
+      <span>❤️ ${hero.health}</span>
+      <span>🏃 ${hero.speed}</span>
+      <span>🗡️ ${hero.attack.join(', ')}</span>
+    `;
+    heroDiv.appendChild(statusDiv);
     heroesDiv.appendChild(heroDiv);
   });
 
   sortedEnemies.forEach(enemy => {
     const enemyDiv = document.createElement('div');
-    enemyDiv.className = `character enemy ${enemy.isAlive() ? '' : 'dead'} ${battle.isCurrentCharacter(enemy) ? 'current' : ''}`;
-    enemyDiv.innerText = `${enemy.name} - ❤️ ${enemy.health} 🏃 ${enemy.speed} 🗡️ ${enemy.attack.join(', ')}`;
-    enemyDiv.title = `Урон: Основная цель: ${enemy.attack[0] || 0}, Соседи: ${enemy.attack[1] || 0}, Остальные: ${enemy.attack[2] || 0}`; // добавляем подробное описание урона
+    enemyDiv.classList.add('character', 'enemy');
+    if (!enemy.isAlive()) enemyDiv.classList.add('dead');
+    if (battle.isCurrentCharacter(enemy)) enemyDiv.classList.add('current');
+    if (enemy.isAttacked()) enemyDiv.classList.add('attack-effect');
+    enemyDiv.innerText = `${enemy.name}`;
+    enemyDiv.title = `Урон: Основная цель: ${enemy.attack[0] || 0}, Соседи: ${enemy.attack[1] || 0}, Остальные: ${enemy.attack[2] || 0}`;
     enemyDiv.id = enemy.name;
+    const statusDiv = document.createElement('div');
+    statusDiv.classList.add('status');
+    statusDiv.innerHTML = `
+      <span>❤️ ${enemy.health}</span>
+      <span>🏃 ${enemy.speed}</span>
+      <span>🗡️ ${enemy.attack.join(', ')}</span>
+    `;
+    enemyDiv.appendChild(statusDiv);
     enemiesDiv.appendChild(enemyDiv);
   });
 }

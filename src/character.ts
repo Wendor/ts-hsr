@@ -5,6 +5,7 @@ export class Character implements CharacterStats {
   health: number;
   attack: number[]; // at target, at neibours, at others
   speed: number;
+  attacked: boolean = false;
 
   constructor(name: string, health: number, attack: number[], speed: number) {
     this.name = name;
@@ -26,6 +27,12 @@ export class Character implements CharacterStats {
     if (this.health < 0) {
       this.health = 0;
     }
+    this.attacked = true;
+    setTimeout(() => this.attacked = false, 500);
+  }
+
+  isAttacked(): boolean {
+    return this.attacked;
   }
 
   isAlive(): boolean {

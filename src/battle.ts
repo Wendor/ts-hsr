@@ -135,7 +135,7 @@ export class Battle {
       const targetButtons = document.querySelectorAll('.enemy');
       targetButtons.forEach(button => {
         button.addEventListener('click', () => {
-          const targetName = button.textContent?.split(' - ')[0];
+          const targetName = button.id;
           const target = this.getAliveTargets(character).find(c => c.name === targetName);
           resolve(target || null);
         });
