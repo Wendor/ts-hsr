@@ -20,25 +20,47 @@ function getStatusDiv(character) {
     const statusDiv = document.createElement('div');
     statusDiv.classList.add('status');
     statusDiv.innerHTML = `
-    <span>HP ${character.health}</span>
-    <span>Мана ${character.mana}</span>
-    <span>Скорость ${character.speed}</span>
+    <span>HP: ${character.health} / MP: ${character.mana} / SPD: ${character.speed}</span>
   `;
     return statusDiv;
 }
-function getSkillSelector(character) {
-    const select = document.createElement('select');
-    select.setAttribute('data-character', character.id);
-    character.skills.forEach(skill => {
-        const option = document.createElement('option');
-        option.value = skill.id;
-        option.text = skill.name;
-        if (character.mana < skill.cost) {
-            option.disabled = true;
+function getCharacterSkillsDiv(character) {
+    const div = document.createElement('div');
+    div.classList.add('character-skills');
+    div.innerHTML = character.skills.map(skill => {
+        if (skill.damage) {
+            return `<span>${skill.name}: урон ${JSON.stringify(skill.damage)}</span>`;
         }
-        select.appendChild(option);
-    });
-    return select;
+        if (skill.heal) {
+            return `<span>${skill.name}: лечение ${JSON.stringify(skill.heal)}</span>`;
+        }
+    }).join('<br />');
+    return div;
+}
+function getSkillDiv(skill) {
+    const skillsDiv = document.getElementById('skills');
+    const div = document.createElement('div');
+    div.innerHTML = skill.name;
+    div.classList.add('skill');
+    let disabled = false;
+    const cc = battle.currentCharacter;
+    if (!cc || cc.mana < skill.cost) {
+        disabled = true;
+        div.classList.add('disabled');
+    }
+    div.onclick = () => {
+        if (disabled) {
+            return;
+        }
+        document.querySelectorAll('.skill').forEach(s => s.classList.remove('current'));
+        skillsDiv.setAttribute('data-selected', skill.id);
+        div.classList.add('current');
+    };
+    if (!skillsDiv.getAttribute('data-selected')) {
+        skillsDiv.setAttribute('data-selected', skill.id);
+        div.classList.add('current');
+    }
+    return div;
 }
 function getCharacterDiv(character) {
     const div = document.createElement('div');
@@ -53,11 +75,11 @@ function getCharacterDiv(character) {
     div.innerHTML = `<b>${character.name}</b>`;
     div.id = character.id;
     div.appendChild(getStatusDiv(character));
+    div.appendChild(getCharacterSkillsDiv(character));
     div.onclick = () => {
         const cc = battle.currentCharacter;
-        const selector = `[data-character="${cc === null || cc === void 0 ? void 0 : cc.id}"]`;
-        const skillSelector = document.querySelectorAll(selector)[0];
-        const skill = cc === null || cc === void 0 ? void 0 : cc.skills.find(s => s.id == (skillSelector === null || skillSelector === void 0 ? void 0 : skillSelector.value));
+        const skillsDiv = document.getElementById('skills');
+        const skill = cc === null || cc === void 0 ? void 0 : cc.skills.find(s => s.id == skillsDiv.getAttribute('data-selected'));
         if (skill) {
             battle.selectSkill(skill);
         }
@@ -66,11 +88,15 @@ function getCharacterDiv(character) {
     return div;
 }
 export function updateBattlefield() {
+    var _a;
     const heroesDiv = document.getElementById('heroes');
     const enemiesDiv = document.getElementById('enemies');
+    const skillsDiv = document.getElementById('skills');
     const logDiv = document.getElementById('log');
     heroesDiv.innerHTML = '';
     enemiesDiv.innerHTML = '';
+    skillsDiv.innerHTML = '';
+    skillsDiv.removeAttribute('data-selected');
     logDiv.innerHTML = battle.getLog();
     const sortedHeroes = [
         ...battle.heroes.filter(c => c.isAlive()),
@@ -82,12 +108,13 @@ export function updateBattlefield() {
     ];
     sortedHeroes.forEach(hero => {
         heroesDiv.appendChild(getCharacterDiv(hero));
-        if (battle.isHero(hero)) {
-            heroesDiv.appendChild(getSkillSelector(hero));
-        }
     });
     sortedEnemies.forEach(enemy => {
         enemiesDiv.appendChild(getCharacterDiv(enemy));
+    });
+    const skills = ((_a = battle.currentCharacter) === null || _a === void 0 ? void 0 : _a.skills) || [];
+    skills.forEach(skill => {
+        skillsDiv.appendChild(getSkillDiv(skill));
     });
 }
 battle.runBattle();
