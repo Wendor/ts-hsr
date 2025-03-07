@@ -6,11 +6,16 @@
     <title>Turn-Based Combat System</title>
     <style>
       body { font-family: Arial, sans-serif; }
-      .character { user-select: none; margin: 10px; padding: 10px; width: 300px; border: 1px solid #ccc; }
+      .character { user-select: none; margin: 10px; padding: 10px; width: 330px; border: 1px solid #ccc; cursor: pointer; }
+      .skill { user-select: none; margin: 10px; padding: 5px 15px; border: 1px solid #ccc; }
       .hero { background-color: #e0ffe0; }
       .enemy { background-color: #ffe0e0; cursor: pointer;}
       .dead { background-color: #d3d3d3; color: #808080; }
+      .disabled { background-color: #d3d3d3; color: #808080; }
       .current { border: 2px solid #c87bff; }
+      .status { float: right; font-size: 12px; color: #808080; }
+      .skills { display: flex; height: 53px; }
+      .character-skills { padding-top: 10px; font-size: 13px; color: #808080;}
       .attack-effect { animation: attackEffect 0.7s; }
       @keyframes attackEffect {
         0% { opacity: 0.5; }
@@ -20,10 +25,11 @@
 </head>
 <body>
     <h1>Turn-Based Combat System</h1>
+    <div id="skills" class="skills"></div>
     <div id="battlefield" class="row" style="display: flex;">
       <div id="heroes"></div>
       <div id="enemies"></div>
-      <div id="log" style="margin-left: 50px; height: 260px; width: 400px; overflow-y: auto;"></div>
+      <div id="log" style="margin-left: 50px; height: 400px; width: 600px; overflow-y: auto;"></div>
     </div>
     <script src="./main.js" type="module"></script>
 </body>

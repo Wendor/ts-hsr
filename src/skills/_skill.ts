@@ -88,8 +88,7 @@ export class Skill {
       attacker.name,
       `атакует`,
       target.name,
-      `с ${damage} урона.`,
-      `Осталось ${target.health} HP`
+      `с ${damage} урона.`
     ].join(' ');
     battle.log.push(logMessage);
   }
