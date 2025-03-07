@@ -10,4 +10,5 @@ bash << EOF
   git clean  -d  -f .
   git checkout master
   git branch -D build
+  npm run build
 EOF
