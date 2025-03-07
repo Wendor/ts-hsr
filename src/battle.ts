@@ -1,14 +1,16 @@
 import { Character } from './character';
 import { EventEmitter } from './components/event-emitter';
+import { Skill } from './skills/_skill';
 import { Timeline } from './timeline';
 
 export class Battle extends EventEmitter {
   public heroes: Character[];
   public enemies: Character[];
   public timeline: Timeline;
-  private log: string[] = [];
-  private currentCharacter: Character | null = null;
-  private targetCharacter: Character | null = null;
+  public log: string[] = [];
+  public currentCharacter: Character | null = null;
+  public targetCharacter: Character | null = null;
+  public currentSkill: Skill | null = null;
 
   constructor(heroes: Character[], enemies: Character[]) {
     super();
@@ -33,11 +35,15 @@ export class Battle extends EventEmitter {
       || this.enemies.every(enemy => !enemy.isAlive());
   }
 
+  private getCharacterSide(character: Character) {
+    return this.heroes.includes(character) ? this.heroes : this.enemies;
+  }
+
   private getTargetSide(character: Character): Character[] {
     return this.heroes.includes(character) ? this.enemies : this.heroes;
   }
 
-  private getAliveTargets(character: Character): Character[] {
+  public getAliveTargets(character: Character): Character[] {
     return this.getTargetSide(character).filter(c => c.isAlive());
   }
 
@@ -50,47 +56,25 @@ export class Battle extends EventEmitter {
     return aliveEnemies[randomIndex];
   }
 
-  private attackTarget(attacker: Character, target: Character, damage: number): void {
-    attacker.attackEnemy(target, damage);
-    const logMessage = [
-      attacker.name,
-      `атакует`,
-      target.name,
-      `с ${damage} урона.`,
-      `Осталось ${target.health} HP`
-    ].join(' ');
-    this.log.push(logMessage);
-  }
-
-  private attackManyTargets(attacker: Character, target: Character, damage: number[]): void {
-    // Получаем список живых целей
-    const targetSide = this.getAliveTargets(attacker);
-    const targetIndex = targetSide.indexOf(target);
-
-    // Атакуем основную цель, если урон для нее задан
-    if (damage[0]) {
-      this.attackTarget(attacker, target, damage[0]);
-    }
-
-    // Атакуем соседей основной цели, если урон для них задан
-    let neighbors: Character[] = [];
-    if (damage[1]) {
-      neighbors = [
-        targetSide[targetIndex - 1],
-        targetSide[targetIndex + 1]
-      ].filter(Boolean);
-      neighbors.forEach(t => this.attackTarget(attacker, t, damage[1]));
-    }
-
-    // Атакуем остальных врагов, если урон для них задан
-    if (damage[2]) {
-      const others = targetSide.filter(c => c !== target && !neighbors.includes(c));
-      others.forEach(o => this.attackTarget(attacker, o, damage[2]));
-    }
-  }
-
   public selectTarget(target: Character): void {
+    if (!this.currentCharacter || !this.currentSkill) {
+      return;
+    }
+
+    const skill = this.currentSkill;
+    const side = this.getCharacterSide(target);
+    if (skill.heal && !side.includes(this.currentCharacter)) {
+      return;
+    }
+    if (skill.damage && side.includes(this.currentCharacter)) {
+      return;
+    }
+
     this.targetCharacter = target;
+  }
+
+  public selectSkill(skill: Skill): void {
+    this.currentSkill = skill;
   }
 
   public async runBattle(): Promise<void> {
@@ -112,6 +96,7 @@ export class Battle extends EventEmitter {
     this.targetCharacter = null;
     this.log.push('');
     this.log.push(`Индекс действия <b>${timeline.actionPoint}</b>`);
+    this.currentSkill = character.skills[0];
     if (!this.isHero(character)) {
       this.targetCharacter = this.getRandomEnemy(character);
     }
@@ -121,10 +106,15 @@ export class Battle extends EventEmitter {
   public async executeTurn(): Promise<void> {
     const character = this.currentCharacter;
     const target = this.targetCharacter;
-    if (!character || !target) {
+    const skill = this.currentSkill;
+
+    if (!character || !target || !skill) {
       return;
     }
-    this.attackManyTargets(character, target, character.attack);
+
+    if (this.currentSkill) {
+      skill.use(this);
+    }
   }
 
   public finishTurn(): void {

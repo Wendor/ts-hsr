@@ -1,11 +1,12 @@
-import { Character } from "src/character";
+import { Character } from "../character";
+import { Skill } from "../skills/_skill";
 
 export interface CharacterStats {
   id: string;
   name: string;
   health: number;
-  attack: number[];
   speed: number;
+  skills: Skill[];
 }
 
 export interface BattleResult {
@@ -23,4 +24,11 @@ export interface Action {
 export interface TimelineCharacter {
   character: Character;
   actionPoint: number;
+}
+
+export interface SkillProps {
+  name: string;
+  cost: number;
+  damage?: number[];
+  heal?: number[];
 }

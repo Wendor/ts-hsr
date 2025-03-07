@@ -1,23 +1,32 @@
+import { Skill } from './skills/_skill';
 import { CharacterStats } from './types';
 
 export class Character implements CharacterStats {
+  id: string;
   name: string;
   health: number;
-  attack: number[]; // at target, at neibours, at others
+  maxHealth: number;
   speed: number;
+  skills: Skill[] = [];
+  mana: number = 100;
+  maxMana: number = 100;
   attacked: boolean = false;
-  id: string;
 
-  constructor(name: string, health: number, attack: number[], speed: number) {
+  constructor(name: string, health: number, speed: number, skills: Skill[]) {
+    this.id = crypto.randomUUID();
     this.name = name;
     this.health = health;
-    this.attack = attack;
+    this.maxHealth = health;
     this.speed = speed;
-    this.id = crypto.randomUUID();
+    this.skills = skills;
   }
 
   attackEnemy(enemy: Character, damage: number): void {
     enemy.takeDamage(damage);
+  }
+
+  healTarget(target: Character, heal: number): void {
+    target.takeHeal(heal);
   }
 
   takeDamage(damage: number): void {
@@ -27,6 +36,20 @@ export class Character implements CharacterStats {
     }
     this.attacked = true;
     setTimeout(() => this.attacked = false, 500);
+  }
+
+  takeHeal(heal: number): void {
+    this.health += heal;
+    if (this.health > this.maxHealth) {
+      this.health = this.maxHealth;
+    }
+  }
+
+  useMana(mana: number): void {
+    this.mana -= mana;
+    if (this.mana > this.maxMana) {
+      this.mana = this.maxMana;
+    }
   }
 
   isAttacked(): boolean {
