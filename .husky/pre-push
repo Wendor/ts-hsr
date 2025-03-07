@@ -1,11 +1,13 @@
-npm run build
-git checkout --orphan build
-rm -rf .husky
-git reset .
-git add -f dist
-git checkout master -- index.html
-git commit -m 'update build'
-git push --force origin build
-git clean  -d  -f .
-git checkout master
-git branch -D build
+bash << EOF
+  npm run build
+  git checkout --orphan build
+  rm -rf .husky
+  git reset .
+  git add -f dist
+  git checkout master -- index.html
+  git commit -m 'update build'
+  git push --force origin build
+  git clean  -d  -f .
+  git checkout master
+  git branch -D build
+EOF
