@@ -11,6 +11,11 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run deploy"
+    }
+  },
   "devDependencies": {
     "@digitak/tsc-esm": "^3.1.4",
     "@types/blessed": "^0.1.25",
