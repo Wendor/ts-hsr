@@ -139,7 +139,7 @@ export class Battle {
             const character = timeline.character;
             this.currentCharacter = character;
             this.log.push('');
-            this.log.push(`Индекс действия ${timeline.actionPoint}`);
+            this.log.push(`<b>Индекс действия ${timeline.actionPoint}</b>`);
             updateBattlefield();
             if (character.isAlive()) {
                 let target = null;
