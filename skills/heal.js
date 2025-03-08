@@ -1,4 +1,4 @@
-import { Skill } from "./_skill.js";
+import { Skill } from "./skill.js";
 export class Heal extends Skill {
     constructor(heal) {
         super({
