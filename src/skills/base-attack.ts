@@ -1,4 +1,4 @@
-import { Skill } from "./_skill";
+import { Skill } from "./skill";
 
 export class BaseAttack extends Skill {
   constructor(damage: number[]) {

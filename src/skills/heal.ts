@@ -1,4 +1,4 @@
-import { Skill } from "./_skill";
+import { Skill } from "./skill";
 
 export class Heal extends Skill {
   constructor(heal: number[]) {

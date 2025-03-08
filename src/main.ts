@@ -2,7 +2,7 @@ import { Character } from './character';
 import { Battle } from './battle';
 import { BaseAttack } from './skills/base-attack';
 import { Heal } from './skills/heal';
-import { Skill } from './skills/_skill';
+import { Skill } from './skills/skill';
 
 const hero1 = new Character('Hero 1', 100, 160, [new BaseAttack([15])]);
 const hero2 = new Character('Hero 2', 100, 115, [

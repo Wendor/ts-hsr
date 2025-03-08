@@ -1,5 +1,5 @@
 import { Character } from "../character";
-import { Skill } from "../skills/_skill";
+import { Skill } from "../skills/skill";
 
 export interface CharacterStats {
   id: string;

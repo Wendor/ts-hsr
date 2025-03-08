@@ -1,6 +1,6 @@
 import { Character } from './character';
 import { EventEmitter } from './components/event-emitter';
-import { Skill } from './skills/_skill';
+import { Skill } from './skills/skill';
 import { Timeline } from './timeline';
 
 export class Battle extends EventEmitter {

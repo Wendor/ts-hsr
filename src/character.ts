@@ -1,4 +1,4 @@
-import { Skill } from './skills/_skill';
+import { Skill } from './skills/skill';
 import { CharacterStats } from './types';
 
 export class Character implements CharacterStats {
