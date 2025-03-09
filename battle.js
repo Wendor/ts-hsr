@@ -36,14 +36,20 @@ export class Battle extends EventEmitter {
     getCharacterSide(character) {
         return this.heroes.includes(character) ? this.heroes : this.enemies;
     }
-    getTargetSide(character) {
+    getOpponentSide(character) {
         return this.heroes.includes(character) ? this.enemies : this.heroes;
+    }
+    getAliveOpponents(character) {
+        return this.getOpponentSide(character).filter(c => c.isAlive());
+    }
+    getTargetSide(character) {
+        return this.heroes.includes(character) ? this.heroes : this.enemies;
     }
     getAliveTargets(character) {
         return this.getTargetSide(character).filter(c => c.isAlive());
     }
     getRandomEnemy(attacker) {
-        const aliveEnemies = this.getAliveTargets(attacker);
+        const aliveEnemies = this.getAliveOpponents(attacker);
         if (aliveEnemies.length === 0) {
             return null;
         }
