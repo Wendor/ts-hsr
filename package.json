@@ -4,17 +4,20 @@
   "description": "A turn-based combat system inspired by Honkai: Star Rail.",
   "main": "src/main.ts",
   "scripts": {
-    "build": "tsc-esm && cp public/index.html dist/index.html",
+    "build": "tsc-esm",
+    "postbuild": "npm run copy-files",
     "dev": "concurrently --raw 'tsc --watch --preserveWatchOutput' 'es-dev-server --app-index index.html --root-dir dist --node-resolve --watch --open'",
-    "postdev": "npm run build",
+    "predev": "npm run build",
     "prepare": "husky",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "copy-files": "copyfiles -u 1 public/* ./dist/"
   },
   "devDependencies": {
     "@digitak/tsc-esm": "^3.1.4",
     "@types/node": "^16.18.126",
     "concurrently": "^9.1.2",
+    "copyfiles": "^2.4.1",
     "es-dev-server": "^2.1.0",
     "gh-pages": "^6.3.0",
     "husky": "^9.1.7",
