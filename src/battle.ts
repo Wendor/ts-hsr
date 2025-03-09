@@ -39,8 +39,16 @@ export class Battle extends EventEmitter {
     return this.heroes.includes(character) ? this.heroes : this.enemies;
   }
 
-  private getTargetSide(character: Character): Character[] {
+  private getOpponentSide(character: Character) {
     return this.heroes.includes(character) ? this.enemies : this.heroes;
+  }
+
+  private getAliveOpponents(character: Character) {
+    return this.getOpponentSide(character).filter(c => c.isAlive());
+  }
+
+  private getTargetSide(character: Character): Character[] {
+    return this.heroes.includes(character) ? this.heroes : this.enemies;
   }
 
   public getAliveTargets(character: Character): Character[] {
@@ -48,7 +56,7 @@ export class Battle extends EventEmitter {
   }
 
   private getRandomEnemy(attacker: Character): Character | null {
-    const aliveEnemies = this.getAliveTargets(attacker);
+    const aliveEnemies = this.getAliveOpponents(attacker);
     if (aliveEnemies.length === 0) {
       return null;
     }

@@ -53,7 +53,7 @@ export class Skill {
     }
 
     // Получаем список живых целей
-    const targetSide = battle.getAliveTargets(healer);
+    const targetSide = battle.getAliveTargets(target);
     const targetIndex = targetSide.indexOf(target);
 
     // Исцеляем основную цель, если хил для нее задан
@@ -99,7 +99,7 @@ export class Skill {
     }
 
     // Получаем список живых целей
-    const targetSide = battle.getAliveTargets(attacker);
+    const targetSide = battle.getAliveTargets(target);
     const targetIndex = targetSide.indexOf(target);
 
     // Атакуем основную цель, если урон для нее задан

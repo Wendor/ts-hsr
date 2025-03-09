@@ -26,10 +26,10 @@
 <body>
     <h1>Turn-Based Combat System</h1>
     <div id="skills" class="skills"></div>
-    <div id="battlefield" class="row" style="display: flex;">
+    <div id="battlefield" class="row" style="display: flex; flex-direction: row; flex-wrap: wrap; width: 100%">
       <div id="heroes"></div>
       <div id="enemies"></div>
-      <div id="log" style="margin-left: 50px; height: 400px; width: 600px; overflow-y: auto;"></div>
+      <div id="log" style="margin-left: 50px; height: 400px; min-width: 600px; overflow-y: auto;"></div>
     </div>
     <script src="./main.js" type="module"></script>
 </body>
